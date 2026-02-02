@@ -1,0 +1,19 @@
+services:
+  backend:
+    image: votre_dockerhub/backend:1.0.0
+    group_add:
+      - "${DOCKER_GID}"
+    volumes:
+      - /var/app/logs/doktor:/usr/src/app/logs
+      - /var/run/docker.sock:/var/run/docker.sock
+    env_file:
+      - .env
+    restart: unless-stopped
+
+  frontend:
+    image: votre_dockerhub/frontend:latest
+    ports:
+      - "${FRONTEND_PORT}:3000"
+    depends_on:
+      - backend
+    restart: unless-stopped
