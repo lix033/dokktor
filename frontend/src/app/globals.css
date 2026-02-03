@@ -3,9 +3,84 @@
 @tailwind utilities;
 
 :root {
-  --docker-blue: #0db7ed;
+  --color-primary: #384d54;
+  --color-accent: #0db7ed;
 }
 
-body {
-  @apply bg-gray-100 text-gray-900 antialiased;
+@layer base {
+  body {
+    @apply bg-docktor-50 text-docktor-900 antialiased;
+    font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+  }
+
+  /* Scrollbar personnalisee */
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+
+  ::-webkit-scrollbar-track {
+    @apply bg-docktor-100;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    @apply bg-docktor-300 rounded-full;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    @apply bg-docktor-400;
+  }
+}
+
+@layer components {
+  .btn-primary {
+    @apply px-4 py-2 bg-primary text-white font-medium rounded-lg 
+           hover:bg-primary-light active:bg-primary-dark
+           transition-colors duration-150 ease-in-out
+           focus:outline-none focus:ring-2 focus:ring-primary/50;
+  }
+
+  .btn-secondary {
+    @apply px-4 py-2 bg-white text-docktor-700 font-medium rounded-lg 
+           border border-docktor-200 hover:bg-docktor-50 
+           active:bg-docktor-100 transition-colors duration-150 ease-in-out
+           focus:outline-none focus:ring-2 focus:ring-docktor-200;
+  }
+
+  .btn-accent {
+    @apply px-4 py-2 bg-accent text-white font-medium rounded-lg 
+           hover:bg-accent-dark active:bg-accent-dark
+           transition-colors duration-150 ease-in-out
+           focus:outline-none focus:ring-2 focus:ring-accent/50;
+  }
+
+  .card {
+    @apply bg-white rounded-xl shadow-card border border-docktor-100
+           transition-shadow duration-200 hover:shadow-soft;
+  }
+
+  .badge {
+    @apply inline-flex items-center px-2.5 py-0.5 rounded-full 
+           text-xs font-medium;
+  }
+
+  .badge-success {
+    @apply bg-emerald-100 text-emerald-800;
+  }
+
+  .badge-warning {
+    @apply bg-amber-100 text-amber-800;
+  }
+
+  .badge-error {
+    @apply bg-red-100 text-red-800;
+  }
+
+  .badge-info {
+    @apply bg-sky-100 text-sky-800;
+  }
+
+  .badge-neutral {
+    @apply bg-docktor-100 text-docktor-700;
+  }
 }
