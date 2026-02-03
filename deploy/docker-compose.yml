@@ -1,6 +1,6 @@
 services:
   backend:
-    image: lix033/docktor-backend:1.0.0
+    image: lix033/docktor-backend:latest
     group_add:
       - "${DOCKER_GID}"
     volumes:
@@ -11,7 +11,7 @@ services:
     restart: unless-stopped
 
   frontend:
-    image: lix033/docktor-frontend:1.0.0
+    image: lix033/docktor-frontend:latest
     ports:
       - "${FRONTEND_PORT}:3000"
     depends_on:
