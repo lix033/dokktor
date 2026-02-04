@@ -54,7 +54,7 @@ export async function healthCheck(
  * Point d'entrée racine - informations basiques de l'API
  */
 export function apiInfo(_req: Request, res: Response): void {
-  res.json({
+  res.status(200).json({
     name: 'Docker Monitor API',
     version: '1.0.0',
     description: 'API de monitoring et contrôle Docker',

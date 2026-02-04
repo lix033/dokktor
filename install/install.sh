@@ -51,7 +51,7 @@ DOCKER_GID=$DOCKER_GID
 EOF
 
 # ====== DOWNLOAD COMPOSE ======
-curl -sSL https://raw.githubusercontent.com/lix033/docktor/main/install/docker-compose.yml -o docker-compose.yml
+curl -sSL https://raw.githubusercontent.com/lix033/docktor/master/install/docker-compose.yml -o docker-compose.yml
 
 # ====== RUN ======
 docker compose pull

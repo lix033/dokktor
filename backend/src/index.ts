@@ -1,6 +1,6 @@
 /**
- * Point d'entrée principal de l'API Docker Monitor
- * Configure Express et démarre le serveur
+ * Point d'entree principal de l'API Docktor
+ * Configure Express et demarre le serveur
  */
 
 import express, { Application } from 'express';
@@ -9,24 +9,22 @@ import helmet from 'helmet';
 import morgan from 'morgan';
 
 import { config, isDevelopment } from './config';
-import { containerRouter } from './routes';
+import { containerRouter, systemRouter } from './routes';
 import { errorHandler, notFoundHandler } from './middleware';
 import { healthCheck, apiInfo } from './controllers';
 import { dockerService } from './services';
-import { LoggerService } from './logger/logger.service';
-const logger = new LoggerService()
 
 /**
- * Crée et configure l'application Express
+ * Cree et configure l'application Express
  */
 function createApp(): Application {
   const app = express();
 
   // ====================================
-  // Middlewares de sécurité
+  // Middlewares de securite
   // ====================================
   
-  // Helmet ajoute des headers de sécurité HTTP
+  // Helmet ajoute des headers de securite HTTP
   app.use(helmet());
 
   // Configuration CORS
@@ -46,7 +44,7 @@ function createApp(): Application {
   // Parsing JSON
   app.use(express.json());
 
-  // Logging des requêtes (format dev en développement, combined en production)
+  // Logging des requetes (format dev en developpement, combined en production)
   app.use(morgan(isDevelopment ? 'dev' : 'combined'));
 
   // ====================================
@@ -62,11 +60,14 @@ function createApp(): Application {
   // Routes API containers
   app.use('/api/containers', containerRouter);
 
+  // Routes API monitoring systeme
+  app.use('/api/system', systemRouter);
+
   // ====================================
   // Gestion d'erreurs
   // ====================================
 
-  // 404 pour les routes non trouvées
+  // 404 pour les routes non trouvees
   app.use(notFoundHandler);
 
   // Gestionnaire d'erreurs global
@@ -76,32 +77,41 @@ function createApp(): Application {
 }
 
 /**
- * Démarre le serveur HTTP
+ * Demarre le serveur HTTP
  */
 async function startServer(): Promise<void> {
   const app = createApp();
 
-  // Vérifie la connexion Docker avant de démarrer
-  logger.info('==>Vérification de la connexion Docker...');
+  // Verifie la connexion Docker avant de demarrer
+  console.log('[Docktor] Verification de la connexion Docker...');
   const dockerConnected = await dockerService.ping();
 
   if (!dockerConnected) {
-    console.warn('==>Impossible de se connecter au socket Docker');
-    console.warn(`==>Chemin configuré: ${config.dockerSocketPath}`);
-    console.warn('==>L\'API démarrera mais les opérations Docker échoueront');
+    console.warn('[Docktor] Impossible de se connecter au socket Docker');
+    console.warn(`[Docktor] Chemin configure: ${config.dockerSocketPath}`);
+    console.warn('[Docktor] L\'API demarrera mais les operations Docker echoueront');
   } else {
-    logger.info('==>Connexion Docker établie');
+    console.log('[Docktor] Connexion Docker etablie');
   }
 
-  // Démarrage du serveur
+  // Demarrage du serveur
   const server = app.listen(config.port, () => {
-    logger.info('');
-    logger.info('Docker Monitor API');
-    logger.info(`==>Serveur démarré sur le port ${config.port}`);
-    logger.info(`==>Environnement: ${config.nodeEnv}`);
-    logger.info(`==>URL: http://localhost:${config.port}`);
-    logger.info(`==>Health: http://localhost:${config.port}/health`);
-    logger.info('');
+    console.log('');
+    console.log('===========================================');
+    console.log('  Docktor API v2.0.0');
+    console.log('  Monitoring Docker & VPS');
+    console.log('===========================================');
+    console.log(`  Port:        ${config.port}`);
+    console.log(`  Environment: ${config.nodeEnv}`);
+    console.log(`  URL:         http://localhost:${config.port}`);
+    console.log('-------------------------------------------');
+    console.log('  Endpoints:');
+    console.log('    GET  /health              Health check');
+    console.log('    GET  /api/containers      List containers');
+    console.log('    GET  /api/system/overview System overview');
+    console.log('    GET  /api/system/metrics  Full metrics');
+    console.log('===========================================');
+    console.log('');
   });
 
   // ====================================
@@ -109,46 +119,46 @@ async function startServer(): Promise<void> {
   // ====================================
 
   /**
-   * Gère l'arrêt propre du serveur
+   * Gere l'arret propre du serveur
    */
   function gracefulShutdown(signal: string): void {
-    logger.info(`\nSignal ${signal} reçu, arrêt en cours...`);
+    console.log(`[Docktor] Signal ${signal} recu, arret en cours...`);
 
     server.close((err) => {
       if (err !== undefined) {
-        logger.error(`Erreur lors de l\'arrêt: ${err}`);
+        console.error('[Docktor] Erreur lors de l\'arret:', err);
         process.exit(1);
       }
 
-      logger.info('Serveur arrêté proprement');
+      console.log('[Docktor] Serveur arrete proprement');
       process.exit(0);
     });
 
-    // Force l'arrêt après 10 secondes si le graceful shutdown échoue
+    // Force l'arret apres 10 secondes si le graceful shutdown echoue
     setTimeout(() => {
-      logger.error('Timeout - arrêt forcé');
+      console.error('[Docktor] Timeout - arret force');
       process.exit(1);
     }, 10000);
   }
 
-  // Écoute des signaux d'arrêt
+  // Ecoute des signaux d'arret
   process.on('SIGTERM', () => gracefulShutdown('SIGTERM'));
   process.on('SIGINT', () => gracefulShutdown('SIGINT'));
 
-  // Gestion des erreurs non capturées
+  // Gestion des erreurs non capturees
   process.on('uncaughtException', (error) => {
-    logger.error(`Exception non capturée: ${error}`);
+    console.error('[Docktor] Exception non capturee:', error);
     gracefulShutdown('uncaughtException');
   });
 
   process.on('unhandledRejection', (reason) => {
-    logger.error(`Promise rejetée non gérée: ${reason}`);
+    console.error('[Docktor] Promise rejetee non geree:', reason);
     gracefulShutdown('unhandledRejection');
   });
 }
 
-// Démarrage
+// Demarrage
 startServer().catch((error: unknown) => {
-  logger.error(`Erreur fatale au démarrage: ${error}` );
+  console.error('[Docktor] Erreur fatale au demarrage:', error);
   process.exit(1);
 });
