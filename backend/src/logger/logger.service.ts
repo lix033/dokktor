@@ -18,7 +18,7 @@ export class LoggerService {
     });
 
     const transports: winston.transport[] = [
-      //Toujours console (stdout)
+      // ✅ Toujours console (stdout)
       new winston.transports.Console({
         format: winston.format.combine(
           winston.format.colorize({ all: !isProd }),
@@ -28,7 +28,7 @@ export class LoggerService {
       })
     ];
 
-    //Logs fichiers UNIQUEMENT hors prod
+    // 🟡 Logs fichiers UNIQUEMENT hors prod
     if (!isProd) {
       const logsPath = process.env.LOGS_PATH ?? "./logs";
 

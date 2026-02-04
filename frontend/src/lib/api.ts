@@ -1,6 +1,6 @@
 /**
- * Client API pour communiquer avec le backend Docker Monitor
- * Gère les appels HTTP et le parsing des réponses
+ * Client API pour communiquer avec le backend Docktor
+ * Gere les appels HTTP et le parsing des reponses
  */
 
 import type {
@@ -11,13 +11,28 @@ import type {
   LogsResponse,
   LogEntry,
   LogsOptions,
+  SystemOverview,
+  SystemOverviewResponse,
+  SystemMetrics,
+  SystemMetricsResponse,
+  ProcessesResponse,
+  DockerStatsResponse,
+  CpuInfo,
+  CpuUsage,
+  MemoryInfo,
+  SwapInfo,
+  DiskInfo,
+  DiskIO,
+  NetworkInterface,
+  NetworkStats,
+  NetworkConnections,
 } from '@/types';
 
 /** URL de base de l'API */
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || '';
 
 /**
- * Classe d'erreur API personnalisée
+ * Classe d'erreur API personnalisee
  */
 export class ApiError extends Error {
   constructor(
@@ -31,7 +46,7 @@ export class ApiError extends Error {
 }
 
 /**
- * Effectue une requête HTTP vers l'API
+ * Effectue une requete HTTP vers l'API
  */
 async function fetchApi<T>(
   endpoint: string,
@@ -61,8 +76,12 @@ async function fetchApi<T>(
   return data as T;
 }
 
+// ============================================
+// API Containers
+// ============================================
+
 /**
- * Récupère la liste de tous les containers
+ * Recupere la liste de tous les containers
  */
 export async function getContainers(): Promise<ContainerInfo[]> {
   const response = await fetchApi<ContainersResponse>('/api/containers');
@@ -70,8 +89,7 @@ export async function getContainers(): Promise<ContainerInfo[]> {
 }
 
 /**
- * Arrête un container
- * @param containerId - ID ou nom du container
+ * Arrete un container
  */
 export async function stopContainer(containerId: string): Promise<ActionResponse> {
   return fetchApi<ActionResponse>(`/api/containers/${containerId}/stop`, {
@@ -80,8 +98,7 @@ export async function stopContainer(containerId: string): Promise<ActionResponse
 }
 
 /**
- * Redémarre un container
- * @param containerId - ID ou nom du container
+ * Redemarre un container
  */
 export async function restartContainer(containerId: string): Promise<ActionResponse> {
   return fetchApi<ActionResponse>(`/api/containers/${containerId}/restart`, {
@@ -90,8 +107,7 @@ export async function restartContainer(containerId: string): Promise<ActionRespo
 }
 
 /**
- * Démarre un container arrêté
- * @param containerId - ID ou nom du container
+ * Demarre un container arrete
  */
 export async function startContainer(containerId: string): Promise<ActionResponse> {
   return fetchApi<ActionResponse>(`/api/containers/${containerId}/start`, {
@@ -100,9 +116,7 @@ export async function startContainer(containerId: string): Promise<ActionRespons
 }
 
 /**
- * Récupère les logs d'un container
- * @param containerId - ID ou nom du container
- * @param options - Options de récupération
+ * Recupere les logs d'un container
  */
 export async function getContainerLogs(
   containerId: string,
@@ -124,11 +138,7 @@ export async function getContainerLogs(
 }
 
 /**
- * Crée une connexion SSE pour le streaming des logs
- * @param containerId - ID ou nom du container
- * @param options - Options du stream
- * @param callbacks - Callbacks pour les événements
- * @returns Fonction pour fermer la connexion
+ * Cree une connexion SSE pour le streaming des logs
  */
 export function streamContainerLogs(
   containerId: string,
@@ -188,9 +198,98 @@ export function streamContainerLogs(
     callbacks.onDisconnected?.();
   };
 
-  // Retourne une fonction pour fermer la connexion
   return () => {
     eventSource.close();
     callbacks.onDisconnected?.();
   };
+}
+
+// ============================================
+// API Monitoring Systeme
+// ============================================
+
+/**
+ * Recupere l'apercu rapide du systeme
+ */
+export async function getSystemOverview(): Promise<SystemOverview> {
+  const response = await fetchApi<SystemOverviewResponse>('/api/system/overview');
+  return response.data;
+}
+
+/**
+ * Recupere toutes les metriques detaillees
+ */
+export async function getSystemMetrics(): Promise<SystemMetrics> {
+  const response = await fetchApi<SystemMetricsResponse>('/api/system/metrics');
+  return response.data;
+}
+
+/**
+ * Recupere les informations CPU
+ */
+export async function getCpuInfo(): Promise<{ info: CpuInfo; usage: CpuUsage }> {
+  const response = await fetchApi<{ success: boolean; data: { info: CpuInfo; usage: CpuUsage } }>(
+    '/api/system/cpu'
+  );
+  return response.data;
+}
+
+/**
+ * Recupere les informations memoire
+ */
+export async function getMemoryInfo(): Promise<{ ram: MemoryInfo; swap: SwapInfo }> {
+  const response = await fetchApi<{ success: boolean; data: { ram: MemoryInfo; swap: SwapInfo } }>(
+    '/api/system/memory'
+  );
+  return response.data;
+}
+
+/**
+ * Recupere les informations des disques
+ */
+export async function getDisksInfo(): Promise<{ disks: DiskInfo[]; io: DiskIO }> {
+  const response = await fetchApi<{ success: boolean; data: { disks: DiskInfo[]; io: DiskIO } }>(
+    '/api/system/disks'
+  );
+  return response.data;
+}
+
+/**
+ * Recupere les informations reseau
+ */
+export async function getNetworkInfo(): Promise<{
+  interfaces: NetworkInterface[];
+  stats: NetworkStats[];
+  connections: NetworkConnections;
+}> {
+  const response = await fetchApi<{
+    success: boolean;
+    data: {
+      interfaces: NetworkInterface[];
+      stats: NetworkStats[];
+      connections: NetworkConnections;
+    };
+  }>('/api/system/network');
+  return response.data;
+}
+
+/**
+ * Recupere la liste des processus
+ */
+export async function getProcesses(
+  limit = 10,
+  sortBy: 'cpu' | 'memory' = 'cpu'
+): Promise<ProcessesResponse['data']> {
+  const response = await fetchApi<ProcessesResponse>(
+    `/api/system/processes?limit=${limit}&sort=${sortBy}`
+  );
+  return response.data;
+}
+
+/**
+ * Recupere les stats Docker detaillees
+ */
+export async function getDockerStats(): Promise<DockerStatsResponse['data']> {
+  const response = await fetchApi<DockerStatsResponse>('/api/system/docker');
+  return response.data;
 }
