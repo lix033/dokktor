@@ -1,0 +1,20 @@
+services:
+  backend:
+    image: lix033/docktor-backend:latest
+    container_name: docktor-backend
+    ports:
+      - "${BACKEND_PORT}:3001"
+    group_add:
+      - "${DOCKER_GID}"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    restart: unless-stopped
+
+  frontend:
+    image: lix033/docktor-frontend:latest
+    container_name: docktor-frontend
+    ports:
+      - "${FRONTEND_PORT}:3002"
+    depends_on:
+      - backend
+    restart: unless-stopped
