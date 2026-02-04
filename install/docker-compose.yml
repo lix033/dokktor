@@ -1,9 +1,7 @@
 services:
   backend:
     image: lix033/docktor-backend:latest
-    container_name: docktor-backend
-    ports:
-      - "${BACKEND_PORT}:3001"
+    container_name: dokktor-backend
     group_add:
       - "${DOCKER_GID}"
     volumes:
@@ -12,7 +10,7 @@ services:
 
   frontend:
     image: lix033/docktor-frontend:latest
-    container_name: docktor-frontend
+    container_name: dokktor-frontend
     ports:
       - "${FRONTEND_PORT}:3002"
     depends_on:

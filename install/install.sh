@@ -39,7 +39,7 @@ echo "++ Backend port: $BACKEND_PORT"
 echo "++ Frontend port: $FRONTEND_PORT"
 
 # ====== INSTALL DIR ======
-INSTALL_DIR="/opt/docktor"
+INSTALL_DIR="/var/app/docktor"
 mkdir -p "$INSTALL_DIR"
 cd "$INSTALL_DIR"
 
@@ -58,5 +58,5 @@ docker compose pull
 docker compose up -d
 
 echo ""
-echo "==>Docktor installed successfully!"
-echo "==>Frontend: http://localhost:$FRONTEND_PORT"
+echo "==>Dokktor installed successfully!"
+echo "==>Frontend: http://vpsIP:$FRONTEND_PORT"

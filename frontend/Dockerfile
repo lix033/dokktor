@@ -30,10 +30,10 @@ COPY --from=builder /app/.next ./.next
 COPY --from=builder /app/public ./public
 COPY --from=builder /app/next.config.js ./next.config.js
 
-EXPOSE 3000
-ENV PORT=3000
+EXPOSE 3002
+ENV PORT=3002
 ENV HOSTNAME=0.0.0.0
 
 USER app
 
-CMD ["node", "node_modules/next/dist/bin/next", "start", "-p", "3000"]
+CMD ["node", "node_modules/next/dist/bin/next", "start", "-p", "3002"]
