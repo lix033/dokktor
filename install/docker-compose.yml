@@ -12,7 +12,7 @@ services:
     image: lix033/docktor-frontend:latest
     container_name: dokktor-frontend
     ports:
-      - "${FRONTEND_PORT}:3002"
+      - "${FRONTEND_PORT}:3000"
     depends_on:
       - backend
     restart: unless-stopped
