@@ -6,3 +6,5 @@ export { ContainerList } from './ContainerList';
 export { LogsViewer } from './LogsViewer';
 export { SystemOverview } from './SystemOverview';
 export { SystemMetricsPanel } from './SystemMetricsPanel';
+export { AppList } from './AppList';
+export { AppDetailModal } from './AppDetailModal';

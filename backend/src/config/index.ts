@@ -4,9 +4,7 @@
  */
 
 import { z } from 'zod';
-import { LoggerService } from '../logger/logger.service';
 
-const logger = new LoggerService()
 /**
  * Schéma de validation de la configuration
  * Zod permet de valider les variables d'environnement au démarrage
@@ -23,7 +21,7 @@ const configSchema = z.object({
   dockerTimeout: z.coerce.number().int().positive().default(30000),
   
   // CORS
-  corsOrigin: z.string().default('*'),
+  corsOrigin: z.string().default('http://localhost:3000'),
   
   // Logging
   logLevel: z.enum(['debug', 'info', 'warn', 'error']).default('info'),
@@ -48,8 +46,8 @@ function loadConfig(): Config {
   const result = configSchema.safeParse(rawConfig);
 
   if (!result.success) {
-    logger.error('Configuration invalide:');
-    logger.error(`${result.error.format()}`);
+    console.error('❌ Configuration invalide:');
+    console.error(result.error.format());
     process.exit(1);
   }
 

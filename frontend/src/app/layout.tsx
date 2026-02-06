@@ -5,7 +5,7 @@ import './globals.css';
 const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
-  title: 'Dokktor Monitor',
+  title: 'Docker Monitor',
   description: 'Dashboard de monitoring et contrôle Docker',
 };
 

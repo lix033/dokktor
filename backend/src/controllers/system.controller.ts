@@ -4,14 +4,13 @@
  */
 
 import { Request, Response } from 'express';
-// import {
-//   SystemMetricsResponse,
-//   // SystemOverviewResponse,
-//   ProcessListResponse,
-//   DockerStatsResponse,
-// } from '../types';
-import { systemMonitorService } from '../services/system.service';
-import { DockerStatsResponse, ProcessListResponse, SystemMetricsResponse, SystemOverviewResponse } from '../types/system.types';
+import { systemMonitorService } from '../services';
+import {
+  SystemMetricsResponse,
+  SystemOverviewResponse,
+  ProcessListResponse,
+  DockerStatsResponse,
+} from '../types';
 
 /**
  * GET /api/system/overview

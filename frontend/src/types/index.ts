@@ -322,3 +322,153 @@ export interface DockerStatsResponse {
   };
   timestamp: string;
 }
+
+// ============================================
+// Types Applications
+// ============================================
+
+/** Types d'applications supportees */
+export type AppType =
+  | 'php'
+  | 'laravel'
+  | 'nodejs'
+  | 'nodejs-typescript'
+  | 'nextjs'
+  | 'static'
+  | 'python'
+  | 'custom';
+
+/** Statuts d'une application */
+export type AppStatus =
+  | 'pending'
+  | 'building'
+  | 'deploying'
+  | 'running'
+  | 'stopped'
+  | 'failed'
+  | 'error';
+
+/** Statuts d'un deploiement */
+export type DeploymentStatus =
+  | 'pending'
+  | 'cloning'
+  | 'building'
+  | 'starting'
+  | 'success'
+  | 'failed';
+
+/** Variable d'environnement */
+export interface EnvVariable {
+  key: string;
+  value: string;
+  isSecret?: boolean;
+}
+
+/** Configuration d'une application */
+export interface AppConfig {
+  id: string;
+  name: string;
+  type: AppType;
+  internalPort: number;
+  externalPort: number;
+  path: string;
+  gitUrl?: string;
+  gitBranch?: string;
+  envVariables: EnvVariable[];
+  dockerfile?: string;
+  dockerCompose?: string;
+  buildCommand?: string;
+  startCommand?: string;
+  status: AppStatus;
+  lastError?: string;
+  createdAt: string;
+  updatedAt: string;
+  containerId?: string;
+  containerName?: string;
+  domain?: string;
+}
+
+/** Template d'application */
+export interface AppTemplate {
+  type: AppType;
+  name: string;
+  description: string;
+  dockerfile: string;
+  dockerCompose: string;
+  defaultEnvVariables: EnvVariable[];
+  defaultInternalPort: number;
+  buildCommand?: string;
+  startCommand?: string;
+}
+
+/** Log de deploiement */
+export interface DeploymentLog {
+  timestamp: string;
+  level: 'info' | 'warn' | 'error' | 'success';
+  message: string;
+  step?: string;
+}
+
+/** Deploiement */
+export interface Deployment {
+  id: string;
+  appId: string;
+  status: DeploymentStatus;
+  startedAt: string;
+  finishedAt?: string;
+  logs: DeploymentLog[];
+  error?: string;
+}
+
+/** Allocation de port */
+export interface PortAllocation {
+  port: number;
+  appId: string;
+  appName: string;
+  allocatedAt: string;
+}
+
+/** Fournisseur Git */
+export type GitProvider = 'github' | 'gitlab' | 'bitbucket' | 'other';
+
+/** Methode d'authentification Git */
+export type GitAuthMethod = 'none' | 'token' | 'ssh' | 'username_password';
+
+/** Configuration Git pour creation */
+export interface GitConfigInput {
+  url: string;
+  branch?: string;
+  isPrivate?: boolean;
+  authMethod?: GitAuthMethod;
+  accessToken?: string;
+  username?: string;
+  password?: string;
+  sshPrivateKey?: string;
+}
+
+/** Requete de creation d'application */
+export interface CreateAppRequest {
+  name: string;
+  type: AppType;
+  git?: GitConfigInput;
+  gitUrl?: string;
+  gitBranch?: string;
+  envVariables?: EnvVariable[];
+  dockerfile?: string;
+  dockerCompose?: string;
+  buildCommand?: string;
+  startCommand?: string;
+  domain?: string;
+}
+
+/** Requete de mise a jour d'application */
+export interface UpdateAppRequest {
+  name?: string;
+  git?: GitConfigInput;
+  envVariables?: EnvVariable[];
+  dockerfile?: string;
+  dockerCompose?: string;
+  buildCommand?: string;
+  startCommand?: string;
+  domain?: string;
+}

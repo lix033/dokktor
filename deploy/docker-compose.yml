@@ -1,10 +1,13 @@
 services:
   backend:
     image: lix033/docktor-backend:latest
+    environment:
+      - APPS_ROOT : "/data"
     group_add:
       - "${DOCKER_GID}"
     volumes:
-      - /var/app/logs/doktor:/usr/src/app/logs
+      - /var/app/logs/dokktor:/usr/src/app/logs
+      - /var/app/dokktor-data:/data
       - /var/run/docker.sock:/var/run/docker.sock
     env_file:
       - .env
