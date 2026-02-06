@@ -4,8 +4,8 @@ set -e
 echo "==>Installing Docktor..."
 
 # ====== DEFAULTS ======
-BACKEND_PORT="${DOCKTOR_BACKEND_PORT:-3001}"
-FRONTEND_PORT="${DOCKTOR_FRONTEND_PORT:-3002}"
+BACKEND_PORT="${DOKKTOR_BACKEND_PORT:-3001}"
+FRONTEND_PORT="${DOKKTOR_FRONTEND_PORT:-3002}"
 
 # ====== CHECK DOCKER ======
 if ! command -v docker >/dev/null 2>&1; then

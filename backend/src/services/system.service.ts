@@ -4,8 +4,22 @@
  */
 
 import si from 'systeminformation';
-import { CpuInfo, CpuUsage, DiskInfo, DiskIO, DockerInfo, DockerStorageInfo, MemoryInfo, NetworkConnections, NetworkInterface, NetworkStats, ProcessInfo, ProcessStats, SwapInfo, SystemInfo } from '../types/system.types';
-
+import {
+  CpuInfo,
+  CpuUsage,
+  MemoryInfo,
+  SwapInfo,
+  DiskInfo,
+  DiskIO,
+  NetworkInterface,
+  NetworkStats,
+  NetworkConnections,
+  SystemInfo,
+  ProcessInfo,
+  ProcessStats,
+  DockerInfo,
+  DockerStorageInfo,
+} from '../types';
 
 /**
  * Service de monitoring du systeme
@@ -190,16 +204,15 @@ class SystemMonitorService {
    * Recupere les statistiques IO des disques
    */
   async getDiskIO(): Promise<DiskIO> {
-    const disksIO = await si.disksIO() as any;
+    const disksIO = await si.disksIO();
 
-return {
-  readBytes: disksIO.rIO_bytes ?? disksIO.rIOBytes ?? 0,
-  writeBytes: disksIO.wIO_bytes ?? disksIO.wIOBytes ?? 0,
-  readOps: disksIO.rIO ?? 0,
-  writeOps: disksIO.wIO ?? 0,
-  totalIOTime: disksIO.tIO ?? 0,
-};
-
+    return {
+      readBytes: (disksIO as any).rIO_bytes ?? 0,
+      writeBytes: (disksIO as any).wIO_bytes ?? 0,
+      readOps: disksIO.rIO || 0,
+      writeOps: disksIO.wIO || 0,
+      totalIOTime: disksIO.tIO || 0,
+    };
   }
 
   // ============================================
@@ -234,18 +247,17 @@ return {
   async getNetworkStats(): Promise<NetworkStats[]> {
     const stats = await si.networkStats();
 
-    return stats.map((stat: any) => ({
-  interface: stat.iface,
-  rxBytes: stat.rx_bytes ?? 0,
-  txBytes: stat.tx_bytes ?? 0,
-  rxPackets: stat.rx_packets ?? 0,
-  txPackets: stat.tx_packets ?? 0,
-  rxErrors: stat.rx_errors ?? 0,
-  txErrors: stat.tx_errors ?? 0,
-  rxDropped: stat.rx_dropped ?? 0,
-  txDropped: stat.tx_dropped ?? 0,
-}));
-
+    return stats.map((stat) => ({
+      interface: stat.iface,
+      rxBytes: stat.rx_bytes,
+      txBytes: stat.tx_bytes,
+      rxPackets: (stat as any).rx_packets ?? 0,
+      txPackets: (stat as any).tx_packets ?? 0,
+      rxErrors: stat.rx_errors || 0,
+      txErrors: stat.tx_errors || 0,
+      rxDropped: stat.rx_dropped || 0,
+      txDropped: stat.tx_dropped || 0,
+    }));
   }
 
   /**
@@ -341,24 +353,24 @@ return {
    */
   async getDockerInfo(): Promise<DockerInfo | null> {
     try {
-      const dockerInfo = await si.dockerInfo() as any;
+      const dockerInfo = await si.dockerInfo();
 
       if (!dockerInfo || dockerInfo.id === '') {
         return null;
       }
 
       return {
-  version: dockerInfo.serverVersion || 'unknown',
-  apiVersion: dockerInfo.apiVersion || dockerInfo.api_version || 'unknown',
-  containers: dockerInfo.containers,
-  containersRunning: dockerInfo.containersRunning,
-  containersPaused: dockerInfo.containersPaused,
-  containersStopped: dockerInfo.containersStopped,
-  images: dockerInfo.images,
-  storageDriver: dockerInfo.driver || 'unknown',
-  dockerRootDir: dockerInfo.dockerRootDir || '/var/lib/docker',
-  memTotal: dockerInfo.memTotal || 0,
-};
+        version: dockerInfo.serverVersion || 'unknown',
+        apiVersion: (dockerInfo as any).apiVersion || 'unknown',
+        containers: dockerInfo.containers,
+        containersRunning: dockerInfo.containersRunning,
+        containersPaused: dockerInfo.containersPaused,
+        containersStopped: dockerInfo.containersStopped,
+        images: dockerInfo.images,
+        storageDriver: dockerInfo.driver || 'unknown',
+        dockerRootDir: dockerInfo.dockerRootDir || '/var/lib/docker',
+        memTotal: dockerInfo.memTotal,
+      };
     } catch {
       return null;
     }
@@ -377,15 +389,13 @@ return {
 
       const imagesSize = images.reduce((acc, img) => acc + (img.size || 0), 0);
       const containersSize = containers.reduce(
-  (acc, c: any) => acc + (c.sizeRw ?? 0) + (c.sizeRootFs ?? 0),
-  0
-);
-
+        (acc, c:any) => acc + (c.sizeRw ?? 0) + (c.sizeRootFs ?? 0),
+        0
+      );
       const volumesSize = volumes.reduce(
-  (acc, v: any) => acc + (v.size ?? 0),
-  0
-);
-
+        (acc, v:any) => acc + (v.size ?? 0),
+        0
+      );
 
       // Estimation du cache de build (non disponible directement)
       const buildCacheSize = 0;

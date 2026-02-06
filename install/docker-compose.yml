@@ -2,12 +2,15 @@ services:
   backend:
     image: lix033/docktor-backend:latest
     container_name: dokktor-backend
+    environment:
+      - APPS_ROOT=/data
     group_add:
       - "${DOCKER_GID}"
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
+      - dokktor-data:/data
     restart: unless-stopped
-
+    
   frontend:
     image: lix033/docktor-frontend:latest
     container_name: dokktor-frontend
@@ -16,3 +19,6 @@ services:
     depends_on:
       - backend
     restart: unless-stopped
+
+volumes:
+  dokktor-data:

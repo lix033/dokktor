@@ -28,6 +28,7 @@ router.get('/', asyncHandler(listContainers));
  * Récupère les détails d'un container spécifique
  */
 router.get('/:id', validateContainerId, asyncHandler(getContainer));
+
 /**
  * GET /api/containers/:id/logs
  * Récupère les logs d'un container

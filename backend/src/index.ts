@@ -9,10 +9,10 @@ import helmet from 'helmet';
 import morgan from 'morgan';
 
 import { config, isDevelopment } from './config';
-import { containerRouter, systemRouter } from './routes';
+import { containerRouter, systemRouter, appRouter } from './routes';
 import { errorHandler, notFoundHandler } from './middleware';
 import { healthCheck, apiInfo } from './controllers';
-import { dockerService } from './services';
+import { dockerService, appDeploymentService } from './services';
 
 /**
  * Cree et configure l'application Express
@@ -31,7 +31,7 @@ function createApp(): Application {
   app.use(
     cors({
       origin: config.corsOrigin,
-      methods: ['GET', 'POST'],
+      methods: ['GET', 'POST', 'PUT', 'DELETE'],
       allowedHeaders: ['Content-Type', 'Authorization'],
       credentials: true,
     })
@@ -41,8 +41,8 @@ function createApp(): Application {
   // Middlewares utilitaires
   // ====================================
 
-  // Parsing JSON
-  app.use(express.json());
+  // Parsing JSON avec limite augmentee pour les gros payloads
+  app.use(express.json({ limit: '10mb' }));
 
   // Logging des requetes (format dev en developpement, combined en production)
   app.use(morgan(isDevelopment ? 'dev' : 'combined'));
@@ -62,6 +62,9 @@ function createApp(): Application {
 
   // Routes API monitoring systeme
   app.use('/api/system', systemRouter);
+
+  // Routes API applications
+  app.use('/api/apps', appRouter);
 
   // ====================================
   // Gestion d'erreurs
@@ -94,22 +97,28 @@ async function startServer(): Promise<void> {
     console.log('[Docktor] Connexion Docker etablie');
   }
 
+  // Synchronisation des statuts des applications
+  console.log('[Docktor] Synchronisation des applications...');
+  await appDeploymentService.syncAppStatuses();
+
   // Demarrage du serveur
   const server = app.listen(config.port, () => {
     console.log('');
     console.log('===========================================');
-    console.log('  Docktor API v2.0.0');
-    console.log('  Monitoring Docker & VPS');
+    console.log('  Docktor API v2.1.0');
+    console.log('  Docker & VPS Monitoring + App Deployment');
     console.log('===========================================');
     console.log(`  Port:        ${config.port}`);
     console.log(`  Environment: ${config.nodeEnv}`);
     console.log(`  URL:         http://localhost:${config.port}`);
     console.log('-------------------------------------------');
     console.log('  Endpoints:');
-    console.log('    GET  /health              Health check');
-    console.log('    GET  /api/containers      List containers');
-    console.log('    GET  /api/system/overview System overview');
-    console.log('    GET  /api/system/metrics  Full metrics');
+    console.log('    GET  /health               Health check');
+    console.log('    GET  /api/containers       List containers');
+    console.log('    GET  /api/system/overview  System overview');
+    console.log('    GET  /api/apps             List applications');
+    console.log('    POST /api/apps             Create application');
+    console.log('    POST /api/apps/:id/deploy  Deploy application');
     console.log('===========================================');
     console.log('');
   });

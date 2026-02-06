@@ -1,7 +1,7 @@
 {
-  "name": "docker-monitor-backend",
-  "version": "1.0.0",
-  "description": "API de monitoring et contrôle Docker - Production Ready",
+  "name": "Dokktor-backend",
+  "version": "2.0.0",
+  "description": "API de monitoring Docker et VPS - Production Ready",
   "main": "dist/index.js",
   "scripts": {
     "dev": "ts-node-dev --respawn --transpile-only src/index.ts",
@@ -14,14 +14,15 @@
     "docker",
     "monitoring",
     "api",
-    "typescript"
+    "typescript",
+    "vps",
+    "server"
   ],
   "author": "",
-  "license": "MIT",
+  "license": "SEE LICENSE IN LICENSE",
   "dependencies": {
     "cors": "^2.8.5",
     "dockerode": "^4.0.2",
-    "dotenv": "^17.2.3",
     "express": "^4.21.0",
     "helmet": "^7.1.0",
     "morgan": "^1.10.0",

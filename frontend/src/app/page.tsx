@@ -2,18 +2,31 @@
 
 /**
  * Page principale du Dashboard Docktor
- * Monitoring Docker et VPS
+ * Monitoring Docker, VPS et Deploiement d'applications
  */
 
 import { useState, useEffect } from 'react';
-import { ContainerList, SystemOverview, SystemMetricsPanel } from '@/components';
+import { useRouter } from 'next/navigation';
+import type { AppConfig } from '@/types';
+import {
+  ContainerList,
+  SystemOverview,
+  SystemMetricsPanel,
+  AppList,
+  AppDetailModal,
+} from '@/components';
 
 /** Types de vue */
-type ViewType = 'containers' | 'system';
+type ViewType = 'containers' | 'system' | 'apps';
 
 export default function DashboardPage() {
+  const router = useRouter();
   const [currentTime, setCurrentTime] = useState<string>('');
   const [activeView, setActiveView] = useState<ViewType>('containers');
+  
+  // Modals
+  const [selectedApp, setSelectedApp] = useState<AppConfig | null>(null);
+  const [autoDeployOnOpen, setAutoDeployOnOpen] = useState(false);
 
   useEffect(() => {
     const updateTime = () => {
@@ -28,6 +41,25 @@ export default function DashboardPage() {
     const interval = setInterval(updateTime, 1000);
     return () => clearInterval(interval);
   }, []);
+
+  const handleCreateApp = () => {
+    router.push('/apps/new');
+  };
+
+  const handleViewApp = (app: AppConfig) => {
+    setSelectedApp(app);
+    setAutoDeployOnOpen(false);
+  };
+
+  const handleDeployApp = (app: AppConfig) => {
+    setSelectedApp(app);
+    setAutoDeployOnOpen(true);
+  };
+
+  const handleAppModalClose = () => {
+    setSelectedApp(null);
+    setAutoDeployOnOpen(false);
+  };
 
   return (
     <div className="min-h-screen flex flex-col bg-docktor-50">
@@ -51,7 +83,7 @@ export default function DashboardPage() {
                   Docktor
                 </h1>
                 <p className="text-xs text-docktor-300">
-                  Docker & VPS Monitoring
+                  VPS & App Management
                 </p>
               </div>
             </div>
@@ -91,6 +123,21 @@ export default function DashboardPage() {
                 </span>
               </button>
               <button
+                onClick={() => setActiveView('apps')}
+                className={`px-4 py-2 text-sm font-medium rounded-lg transition-colors ${
+                  activeView === 'apps'
+                    ? 'text-primary bg-docktor-50'
+                    : 'text-docktor-500 hover:text-primary hover:bg-docktor-50'
+                }`}
+              >
+                <span className="flex items-center gap-2">
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+                  </svg>
+                  Applications
+                </span>
+              </button>
+              <button
                 onClick={() => setActiveView('system')}
                 className={`px-4 py-2 text-sm font-medium rounded-lg transition-colors ${
                   activeView === 'system'
@@ -119,7 +166,7 @@ export default function DashboardPage() {
       {/* Contenu principal */}
       <main className="flex-1 py-6">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          {activeView === 'containers' ? (
+          {activeView === 'containers' && (
             <div className="space-y-6">
               {/* Apercu systeme en haut */}
               <SystemOverview />
@@ -127,7 +174,17 @@ export default function DashboardPage() {
               {/* Liste des containers */}
               <ContainerList />
             </div>
-          ) : (
+          )}
+
+          {activeView === 'apps' && (
+            <AppList
+              onCreateApp={handleCreateApp}
+              onViewApp={handleViewApp}
+              onDeployApp={handleDeployApp}
+            />
+          )}
+
+          {activeView === 'system' && (
             <SystemMetricsPanel />
           )}
         </div>
@@ -138,14 +195,24 @@ export default function DashboardPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <div className="flex flex-col sm:flex-row items-center justify-between gap-2">
             <p className="text-sm text-docktor-400">
-              Docktor v2.0.0
+              Docktor v2.1.0
             </p>
             <p className="text-sm text-docktor-400">
-              Docker & VPS Monitoring
+              VPS Monitoring & App Deployment
             </p>
           </div>
         </div>
       </footer>
+
+      {/* Modals */}
+      {selectedApp && (
+        <AppDetailModal
+          app={selectedApp}
+          onClose={handleAppModalClose}
+          onUpdate={() => {}}
+          autoDeployOnOpen={autoDeployOnOpen}
+        />
+      )}
     </div>
   );
 }

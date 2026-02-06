@@ -68,7 +68,6 @@ export interface ErrorResponse {
   details?: unknown;
 }
 
-
 /** Options pour la récupération des logs */
 export interface LogsOptions {
   /** Nombre de lignes à récupérer (défaut: 100) */
@@ -120,4 +119,3 @@ export interface LogStreamConfig {
   /** Nombre de lignes initiales (défaut: 50) */
   initialTail: number;
 }
-

@@ -293,3 +293,183 @@ export async function getDockerStats(): Promise<DockerStatsResponse['data']> {
   const response = await fetchApi<DockerStatsResponse>('/api/system/docker');
   return response.data;
 }
+
+// ============================================
+// API Applications
+// ============================================
+
+import type {
+  AppConfig,
+  AppTemplate,
+  Deployment,
+  CreateAppRequest,
+  UpdateAppRequest,
+  PortAllocation,
+} from '@/types';
+
+/**
+ * Recupere la liste des applications
+ */
+export async function getApps(): Promise<AppConfig[]> {
+  const response = await fetchApi<{ success: boolean; data: AppConfig[] }>('/api/apps');
+  return response.data;
+}
+
+/**
+ * Recupere une application par son ID
+ */
+export async function getApp(appId: string): Promise<AppConfig> {
+  const response = await fetchApi<{ success: boolean; data: AppConfig }>(`/api/apps/${appId}`);
+  return response.data;
+}
+
+/**
+ * Cree une nouvelle application
+ */
+export async function createApp(request: CreateAppRequest): Promise<AppConfig> {
+  const response = await fetchApi<{ success: boolean; data: AppConfig }>('/api/apps', {
+    method: 'POST',
+    body: JSON.stringify(request),
+  });
+  return response.data;
+}
+
+/**
+ * Met a jour une application
+ */
+export async function updateApp(appId: string, request: UpdateAppRequest): Promise<AppConfig> {
+  const response = await fetchApi<{ success: boolean; data: AppConfig }>(`/api/apps/${appId}`, {
+    method: 'PUT',
+    body: JSON.stringify(request),
+  });
+  return response.data;
+}
+
+/**
+ * Supprime une application
+ */
+export async function deleteApp(appId: string): Promise<void> {
+  await fetchApi(`/api/apps/${appId}`, { method: 'DELETE' });
+}
+
+/**
+ * Lance le deploiement d'une application
+ */
+export async function deployApp(appId: string, force = false): Promise<Deployment> {
+  const response = await fetchApi<{ success: boolean; data: Deployment }>(
+    `/api/apps/${appId}/deploy`,
+    {
+      method: 'POST',
+      body: JSON.stringify({ force }),
+    }
+  );
+  return response.data;
+}
+
+/**
+ * Arrete une application
+ */
+export async function stopAppService(appId: string): Promise<void> {
+  await fetchApi(`/api/apps/${appId}/stop`, { method: 'POST' });
+}
+
+/**
+ * Demarre une application
+ */
+export async function startAppService(appId: string): Promise<void> {
+  await fetchApi(`/api/apps/${appId}/start`, { method: 'POST' });
+}
+
+/**
+ * Redemarre une application
+ */
+export async function restartAppService(appId: string): Promise<void> {
+  await fetchApi(`/api/apps/${appId}/restart`, { method: 'POST' });
+}
+
+/**
+ * Recupere les logs d'une application
+ */
+export async function getAppLogs(appId: string, tail = 100): Promise<string> {
+  const response = await fetchApi<{ success: boolean; data: { logs: string } }>(
+    `/api/apps/${appId}/logs?tail=${tail}`
+  );
+  return response.data.logs;
+}
+
+/**
+ * Recupere l'historique des deploiements
+ */
+export async function getAppDeployments(appId: string): Promise<Deployment[]> {
+  const response = await fetchApi<{ success: boolean; data: Deployment[] }>(
+    `/api/apps/${appId}/deployments`
+  );
+  return response.data;
+}
+
+/**
+ * Recupere un deploiement specifique
+ */
+export async function getDeployment(deploymentId: string): Promise<Deployment> {
+  const response = await fetchApi<{ success: boolean; data: Deployment }>(
+    `/api/apps/deployments/${deploymentId}`
+  );
+  return response.data;
+}
+
+/**
+ * Recupere les templates disponibles
+ */
+export async function getAppTemplates(): Promise<AppTemplate[]> {
+  const response = await fetchApi<{ success: boolean; data: AppTemplate[] }>('/api/apps/templates');
+  return response.data;
+}
+
+/**
+ * Recupere les informations sur les ports
+ */
+export async function getPortsInfo(): Promise<{
+  allocated: PortAllocation[];
+  available: number[];
+  range: { start: number; end: number };
+}> {
+  const response = await fetchApi<{
+    success: boolean;
+    data: {
+      allocated: PortAllocation[];
+      available: number[];
+      range: { start: number; end: number };
+    };
+  }>('/api/apps/ports');
+  return response.data;
+}
+
+/**
+ * Synchronise les statuts des applications
+ */
+export async function syncApps(): Promise<void> {
+  await fetchApi('/api/apps/sync', { method: 'POST' });
+}
+
+/**
+ * Valide une configuration Git
+ */
+export async function validateGitConfig(gitConfig: {
+  url?: string;
+  branch?: string;
+  isPrivate?: boolean;
+  authMethod?: string;
+  accessToken?: string;
+  username?: string;
+  password?: string;
+  sshPrivateKey?: string;
+}): Promise<{ valid: boolean; errors: string[] }> {
+  const response = await fetchApi<{
+    success: boolean;
+    data: { valid: boolean; errors: string[] };
+  }>('/api/apps/validate-git', {
+    method: 'POST',
+    body: JSON.stringify(gitConfig),
+  });
+  return response.data;
+}
