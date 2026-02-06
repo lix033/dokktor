@@ -5,7 +5,7 @@ const nextConfig = {
     return [
       {
         source: '/api/:path*',
-        destination: `${'http://dokktor-backend:3001'}/api/:path*`,x
+        destination: `${'http://dokktor-backend:3001'}/api/:path*`,
       },
     ];
   },
