@@ -80,7 +80,7 @@ export default function DashboardPage() {
               </div>
               <div>
                 <h1 className="text-lg font-semibold text-white tracking-tight">
-                  Docktor
+                  Dokktor
                 </h1>
                 <p className="text-xs text-docktor-300">
                   VPS & App Management
@@ -195,7 +195,7 @@ export default function DashboardPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <div className="flex flex-col sm:flex-row items-center justify-between gap-2">
             <p className="text-sm text-docktor-400">
-              Docktor v2.1.0
+              Dokktor v0.1.7
             </p>
             <p className="text-sm text-docktor-400">
               VPS Monitoring & App Deployment
