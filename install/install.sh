@@ -39,7 +39,7 @@ echo "++ Backend port: $BACKEND_PORT"
 echo "++ Frontend port: $FRONTEND_PORT"
 
 # ====== INSTALL DIR ======
-INSTALL_DIR="/var/app/docktor"
+INSTALL_DIR="/var/app/dokktor"
 mkdir -p "$INSTALL_DIR"
 cd "$INSTALL_DIR"
 
