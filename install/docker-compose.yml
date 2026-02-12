@@ -3,12 +3,12 @@ services:
     image: lix033/docktor-backend:latest
     container_name: dokktor-backend
     environment:
-      - APPS_ROOT="/var/app"
+      - APPS_ROOT: /var/app
     group_add:
       - "${DOCKER_GID}"
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
-      - /var/app/doktor-data:/data
+      - /var/app/dokktor-data:/data
     restart: unless-stopped
     
   frontend:
