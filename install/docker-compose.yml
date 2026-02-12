@@ -3,7 +3,7 @@ services:
     image: lix033/docktor-backend:latest
     container_name: dokktor-backend
     environment:
-      - APPS_ROOT: /var/app
+      - APPS_ROOT: "/var/app"
     group_add:
       - "${DOCKER_GID}"
     volumes:
